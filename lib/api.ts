@@ -12,7 +12,16 @@ const getAuthToken = () => {
 
 // Leaders API
 export const getLeaders = async () => {
-  const response = await fetch(`${API_BASE_URL}/leaders`);
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/leaders`, {
+    headers,
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch leaders");
   }
@@ -28,7 +37,15 @@ export const searchLeaders = async (query: string) => {
 };
 
 export const getLeader = async (id: string) => {
-  const response = await fetch(`${API_BASE_URL}/leaders/${id}`);
+   const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const response = await fetch(`${API_BASE_URL}/leaders/${id}`,{
+    headers,
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch leader");
   }
@@ -141,13 +158,41 @@ export const getFaults = async () => {
     headers,
   });
   if (!response.ok) {
-    throw new Error("Failed to fetch faults");
+    const errorData = await response.json().catch(() => ({ message: "Failed to fetch faults" }));
+    throw new Error(errorData.message || "Failed to fetch faults");
+  }
+  return response.json();
+};
+
+export const getFault = async (id: string) => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/faults/${id}`, {
+    headers,
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: "Failed to fetch fault" }));
+    throw new Error(errorData.message || "Failed to fetch fault");
   }
   return response.json();
 };
 
 export const getLeaderFaults = async (leaderId: string) => {
-  const response = await fetch(`${API_BASE_URL}/leaders/${leaderId}/faults`);
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/leaders/${leaderId}/faults`, {
+    headers,
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch leader faults");
   }
@@ -196,6 +241,54 @@ export const deleteFault = async (id: string) => {
   if (!response.ok) {
     throw new Error("Failed to delete fault");
   }
+  return response.json();
+};
+
+export const likeFault = async (id: string) => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/faults/${id}/like`, {
+    method: "POST",
+    headers,
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    if (response.status === 409) {
+      throw new Error("You have already voted on this fault");
+    }
+    throw new Error(errorData.message || "Failed to like fault");
+  }
+  
+  return response.json();
+};
+
+export const dislikeFault = async (id: string) => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/faults/${id}/dislike`, {
+    method: "POST",
+    headers,
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    if (response.status === 409) {
+      throw new Error("You have already voted on this fault");
+    }
+    throw new Error(errorData.message || "Failed to dislike fault");
+  }
+  
   return response.json();
 };
 
