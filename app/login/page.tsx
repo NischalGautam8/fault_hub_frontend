@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
+import { loginUser } from "@/lib/api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -19,28 +20,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Replace with actual API endpoint
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        // Handle successful login
-        const data = await response.json();
-        // Store JWT in localStorage
-        localStorage.setItem("jwt", data.jwt);
-        // Redirect to home page or dashboard
-        window.location.href = "/";
-      } else {
-        // Handle login error
-        setError("Invalid username or password");
-      }
+      const data = await loginUser(username, password);
+      // Store JWT in localStorage
+      localStorage.setItem("jwt", data.jwt);
+      // Redirect to home page or dashboard
+      window.location.href = "/";
     } catch (err) {
-      setError("An error occurred during login");
+      setError("Invalid username or password");
       console.error(err);
     } finally {
       setLoading(false);

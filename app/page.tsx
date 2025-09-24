@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import AddFaultForm from "@/components/add-fault-form";
+import { getFaults } from "@/lib/api";
 
 // Define types for our data
 interface Fault {
@@ -17,21 +19,18 @@ export default function Home() {
   const [faults, setFaults] = useState<Fault[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch faults from the backend
-    const fetchFaults = async () => {
-      try {
-        // Replace with actual API endpoint
-        const response = await fetch("/api/faults");
-        const data = await response.json();
-        setFaults(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching faults:", error);
-        setLoading(false);
-      }
-    };
+  const fetchFaults = async () => {
+    try {
+      const data = await getFaults();
+      setFaults(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching faults:", error);
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchFaults();
   }, []);
 
@@ -41,12 +40,8 @@ export default function Home() {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Leader Faults</h1>
-        <Button asChild>
-          <Link href="/leaders">View Leaders</Link>
-        </Button>
-      </div>
+      
+      <AddFaultForm onFaultAdded={fetchFaults} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {faults.map((fault) => (

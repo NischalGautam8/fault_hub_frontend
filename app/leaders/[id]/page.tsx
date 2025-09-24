@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AddFaultForm from "@/components/add-fault-form";
 import { getLeader, likeLeader, dislikeLeader } from "@/lib/api";
+import { toast } from "sonner";
 
 // Define types for our data
 interface Fault {
@@ -14,6 +15,10 @@ interface Fault {
   title: string;
   description: string;
   imageUrl: string;
+}
+
+interface ApiError extends Error {
+  message: string;
 }
 
 interface Leader {
@@ -24,6 +29,7 @@ interface Leader {
   dislikes: number;
   numberOfFaults: number;
   faults: Fault[];
+  voteStatus?: "LIKED" | "DISLIKED" | null;
 }
 
 export default function LeaderDetailPage({ params }: { params: { id: string } }) {
@@ -55,8 +61,14 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
     try {
       await likeLeader(params.id);
       fetchLeader();
-    } catch (error) {
+      toast.success("Leader liked successfully!");
+    } catch (error: unknown) {
       console.error("Error liking leader:", error);
+      if (error instanceof Error) {
+        toast.error(error.message || "Failed to like leader. Please try again.");
+      } else {
+        toast.error("Failed to like leader. Please try again.");
+      }
     }
   };
 
@@ -64,8 +76,14 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
     try {
       await dislikeLeader(params.id);
       fetchLeader();
-    } catch (error) {
+      toast.success("Leader disliked successfully!");
+    } catch (error: unknown) {
       console.error("Error disliking leader:", error);
+      if (error instanceof Error) {
+        toast.error(error.message || "Failed to dislike leader. Please try again.");
+      } else {
+        toast.error("Failed to dislike leader. Please try again.");
+      }
     }
   };
 
@@ -95,13 +113,25 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
         </CardContent>
         <CardFooter className="flex justify-between">
           <div className="flex space-x-4">
-            <Button onClick={handleLike}>Like ({leader.likes})</Button>
-            <Button variant="destructive" onClick={handleDislike}>Dislike ({leader.dislikes})</Button>
+            <Button 
+              onClick={handleLike} 
+              variant={leader.voteStatus === "LIKED" ? "default" : "outline"}
+              disabled={leader.voteStatus === "LIKED" || leader.voteStatus === "DISLIKED"}
+            >
+              Like ({leader.likes})
+            </Button>
+            <Button 
+              variant={leader.voteStatus === "DISLIKED" ? "destructive" : "outline"} 
+              onClick={handleDislike}
+              disabled={leader.voteStatus === "LIKED" || leader.voteStatus === "DISLIKED"}
+            >
+              Dislike ({leader.dislikes})
+            </Button>
           </div>
         </CardFooter>
       </Card>
 
-      <AddFaultForm leaderId={leader.id} onFaultAdded={handleFaultAdded} />
+      <AddFaultForm onFaultAdded={handleFaultAdded} />
 
       <h2 className="text-2xl font-bold mb-4">Faults</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

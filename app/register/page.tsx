@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
+import { registerUser } from "@/lib/api";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -30,28 +31,15 @@ export default function RegisterPage() {
     }
 
     try {
-      // Replace with actual API endpoint
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      if (response.ok) {
-        // Handle successful registration
-        setSuccess("Account created successfully! You can now login.");
-        setUsername("");
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-      } else {
-        // Handle registration error
-        setError("Failed to create account");
-      }
+      await registerUser(username, email, password);
+      // Handle successful registration
+      setSuccess("Account created successfully! You can now login.");
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (err) {
-      setError("An error occurred during registration");
+      setError("Failed to create account");
       console.error(err);
     } finally {
       setLoading(false);

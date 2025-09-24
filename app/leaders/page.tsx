@@ -15,6 +15,7 @@ interface Leader {
   likes: number;
   dislikes: number;
   numberOfFaults: number;
+  voteStatus?: "LIKED" | "DISLIKED" | null;
 }
 
 export default function LeadersPage() {
