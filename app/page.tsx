@@ -97,9 +97,9 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {faults.map((fault) => (
-              <Card key={fault.id} className="glass-card floating-card compact-padding overflow-hidden">
+              <Card key={fault.id} className="glass-card floating-card p-2 overflow-hidden"> {/* Changed compact-padding to p-2 */}
                 {fault.imageUrl && (
-                  <div className="aspect-video relative -m-3 mb-3 rounded-lg overflow-hidden">
+                  <div className="aspect-video relative -m-2 mb-2 rounded-lg overflow-hidden"> {/* Changed -m-3 mb-3 to -m-2 mb-2 */}
                     <img 
                       src={fault.imageUrl} 
                       alt={fault.title} 
@@ -109,20 +109,20 @@ export default function Home() {
                   </div>
                 )}
                 
-                <CardHeader className="compact-padding-sm">
-                  <CardTitle className="text-lg font-semibold line-clamp-2">{fault.title}</CardTitle>
+                <CardHeader className="p-2"> {/* Changed compact-padding-sm to p-2 */}
+                  <CardTitle className="text-base font-semibold line-clamp-2">{fault.title}</CardTitle> {/* Reduced font size */}
                 </CardHeader>
                 
-                <CardContent className="compact-padding-sm">
-                  <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{fault.description}</p>
+                <CardContent className="p-2 pt-0"> {/* Changed compact-padding-sm to p-2 pt-0 */}
+                  <p className="text-xs text-muted-foreground line-clamp-3 mb-2">{fault.description}</p> {/* Reduced font size and margin */}
                   
                   {fault.leaders && fault.leaders.length > 0 && (
-                    <div className="mb-3">
-                      <h4 className="text-xs font-medium mb-2 text-muted-foreground">Leaders Involved:</h4>
+                    <div className="mb-2"> {/* Reduced margin */}
+                      <h4 className="text-xs font-medium mb-1 text-muted-foreground">Leaders Involved:</h4> {/* Reduced margin */}
                       <div className="flex flex-wrap gap-1">
                         {fault.leaders.map((leader) => (
                           <Link key={leader.id} href={`/leaders/${leader.id}`} passHref>
-                            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/20 cursor-pointer transition-colors">
+                            <span className="inline-flex items-center rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/20 cursor-pointer transition-colors"> {/* Reduced padding */}
                               {leader.name}
                             </span>
                           </Link>
@@ -132,17 +132,17 @@ export default function Home() {
                   )}
 
                   {/* Vote Statistics */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2 text-xs">
-                      <div className="flex items-center space-x-1 bg-success-green/10 text-success-green px-2 py-1 rounded-full">
+                  <div className="flex items-center justify-between mb-2"> {/* Reduced margin */}
+                    <div className="flex items-center space-x-1 text-xs"> {/* Reduced space-x */}
+                      <div className="flex items-center space-x-0.5 bg-success-green/10 text-success-green px-1.5 py-0.5 rounded-full"> {/* Reduced padding and space-x */}
                         <TrendingUp className="h-3 w-3" />
                         <span>{fault.percentageLiked.toFixed(0)}%</span>
                       </div>
-                      <div className="flex items-center space-x-1 text-muted-foreground">
+                      <div className="flex items-center space-x-0.5 text-muted-foreground"> {/* Reduced space-x */}
                         <ThumbsUp className="h-3 w-3" />
                         <span>{fault.likes}</span>
                       </div>
-                      <div className="flex items-center space-x-1 text-muted-foreground">
+                      <div className="flex items-center space-x-0.5 text-muted-foreground"> {/* Reduced space-x */}
                         <ThumbsDown className="h-3 w-3" />
                         <span>{fault.dislikes}</span>
                       </div>
@@ -150,8 +150,8 @@ export default function Home() {
                   </div>
                 </CardContent>
                 
-                <CardFooter className="compact-padding-sm">
-                  <div className="flex space-x-2 w-full">
+                <CardFooter className="p-2 pt-0"> {/* Changed compact-padding-sm to p-2 pt-0 */}
+                  <div className="flex space-x-1 w-full"> {/* Reduced space-x */}
                     <Button 
                       onClick={async () => {
                         if (!getAuthToken()) {
@@ -190,7 +190,7 @@ export default function Home() {
                           : "hover:bg-success-green/10 hover:text-success-green hover:border-success-green/30"
                       }`}
                     >
-                      <ThumbsUp className="h-4 w-4 mr-1" />
+                      <ThumbsUp className="h-3 w-3 mr-1" /> {/* Reduced icon size */}
                       {fault.voteStatus === "liked" ? "Agreed" : "Agree"}
                     </Button>
 
@@ -232,7 +232,7 @@ export default function Home() {
                           : "hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
                       }`}
                     >
-                      <ThumbsDown className="h-4 w-4 mr-1" />
+                      <ThumbsDown className="h-3 w-3 mr-1" /> {/* Reduced icon size */}
                       {fault.voteStatus === "disliked" ? "Disagreed" : "Disagree"}
                     </Button>
                   </div>

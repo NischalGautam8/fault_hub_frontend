@@ -11,7 +11,7 @@ const mockFaults = [
  
 ];
 
-const mockLeaders = [
+const    = [
   
 ];
 
@@ -88,7 +88,7 @@ function ModernAddFaultForm() {
             className="modern-button gradient-primary text-white border-0"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Report
+            Fault
           </Button>
         </div>}
         
@@ -106,7 +106,7 @@ function ModernAddFaultForm() {
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium">Evidence URL (optional)</label>
+                <label className="text-sm font-medium">Image</label>
                 <input
                   placeholder="Link to supporting image or document"
                   className="w-full bg-white/50 border border-white/30 rounded-lg px-3 py-2 focus:bg-white/80 transition-all outline-none focus:ring-2 focus:ring-primary/20"
@@ -168,7 +168,7 @@ function ModernAddFaultForm() {
 
 export default function ModernRevampPreview() {
   const [currentView, setCurrentView] = useState<'home' | 'leaders' | 'leader-detail'>('home');
-  const [selectedLeader, setSelectedLeader] = useState(mockLeaders[0]);
+  const [selectedLeader, setSelectedLeader] = useState( [0]);
 
   return (
     <div className="min-h-screen">
@@ -320,7 +320,7 @@ export default function ModernRevampPreview() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockLeaders.map((leader) => (
+            { .map((leader) => (
               <Card key={leader.id} className="glass-card floating-card compact-padding">
                 <CardHeader className="compact-padding-sm">
                   <div className="flex items-start justify-between">

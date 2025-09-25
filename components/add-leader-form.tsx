@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react"; // Import useEffect
 import { useRouter } from "next/navigation"; // Import useRouter
 import { createLeader, getAuthToken } from "@/lib/api"; // Import getAuthToken
-import { UserPlus, AlertCircle } from "lucide-react";
+import { UserPlus, AlertCircle, CheckCircle2 } from "lucide-react"; // Import CheckCircle2
 
 interface AddLeaderFormProps {
   onLeaderAdded: () => void;
@@ -22,6 +22,16 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
   const [showForm, setShowForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter(); // Initialize useRouter
+
+  // Effect to auto-hide success message
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess("");
+      }, 3000); // Hide after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   const handleAddLeaderClick = () => {
     if (!getAuthToken()) {
@@ -69,16 +79,16 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
 
   return (
     <div className="">
-      <div className="glass-card  rounded-xl">
+      <div className="glass-card rounded-xl "> {/* Added p-6 here for consistent padding */}
         {success && (
-          <div className="flex items-center  space-x-2 text-success-green bg-success-green/10 p-3 rounded-lg mb-4">
-            <AlertCircle className="h-4 w-4" />
+          <div className="flex items-center space-x-2 text-success-green bg-success-green/10 p-3 rounded-lg mb-4 animate-fade-in-out"> {/* Added animation class */}
+            <CheckCircle2 className="h-4 w-4" /> {/* Changed icon to CheckCircle2 */}
             <span className="text-sm font-medium">{success}</span>
           </div>
         )}
 
         {!showForm ? (
-          <div className="flex items-center  justify-center h-full">
+          <div className="flex items-center justify-center h-full">
             <Button 
               onClick={handleAddLeaderClick}
               className="modern-button gradient-secondary text-white border-0"
