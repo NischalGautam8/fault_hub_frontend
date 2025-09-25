@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createLeader } from "@/lib/api";
+import { UserPlus, AlertCircle } from "lucide-react";
 
 interface AddLeaderFormProps {
   onLeaderAdded: () => void;
@@ -13,9 +14,12 @@ interface AddLeaderFormProps {
 export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,17 +27,30 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
     setError("");
     setSuccess("");
 
+    if (!image) {
+      setError("Please select an image file.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await createLeader(name, description);
-      // Handle successful creation
-      setSuccess("Leader added successfully!");
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("image", image);
+
+      await createLeader(formData);
+      setSuccess("Leader added successfully to the directory!");
       setName("");
       setDescription("");
-      // Notify parent component that leader was added
+      setImage(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setShowForm(false);
       onLeaderAdded();
     } catch (err) {
-      // Handle error
-      setError("Failed to add leader");
+      setError("Failed to add leader to directory");
       console.error(err);
     } finally {
       setLoading(false);
@@ -41,35 +58,108 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
   };
 
   return (
-    <div className="mb-8 p-6 border rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Add New Leader</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Leader Name</Label>
-          <Input
-            id="name"
-            placeholder="Enter leader name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Input
-            id="description"
-            placeholder="Enter leader description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
-        {error && <div className="text-red-500">{error}</div>}
-        {success && <div className="text-green-500">{success}</div>}
-        <Button type="submit" disabled={loading}>
-          {loading ? "Adding..." : "Add Leader"}
-        </Button>
-      </form>
+    <div className="">
+      <div className="glass-card p-6 rounded-xl">
+        {success && (
+          <div className="flex items-center  space-x-2 text-success-green bg-success-green/10 p-3 rounded-lg mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">{success}</span>
+          </div>
+        )}
+
+        {!showForm ? (
+          <div className="flex items-center justify-center h-full">
+            <Button 
+              onClick={() => setShowForm(true)}
+              className="modern-button gradient-secondary text-white border-0"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Add New Leader to Directory
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <UserPlus className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Add New Leader</h2>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">Leader Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="Enter leader's full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="bg-white/50 border-white/30 focus:bg-white/80 transition-all"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+                  <Input
+                    id="description"
+                    placeholder="e.g., Mayor, Governor, CEO, etc."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                    className="bg-white/50 border-white/30 focus:bg-white/80 transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="image" className="text-sm font-medium">Leader Image</Label>
+                  <Input
+                    id="image"
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
+                    required
+                    className="bg-white/50 border-white/30 focus:bg-white/80 transition-all"
+                  />
+                </div>
+              </div>
+              
+              {error && (
+                <div className="flex items-center space-x-2 text-destructive bg-destructive/10 p-3 rounded-lg">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">{error}</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between pt-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowForm(false);
+                    setName("");
+                    setDescription("");
+                    setImage(null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
+                    setError("");
+                    setSuccess("");
+                  }}
+                  className="modern-button"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="modern-button gradient-secondary text-white border-0"
+                >
+                  {loading ? "Adding..." : "Add Leader"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

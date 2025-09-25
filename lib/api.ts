@@ -10,8 +10,30 @@ const getAuthToken = () => {
   return null;
 };
 
+interface PaginationData {
+  pageCount: number;
+  totalElements: number;
+  // Add other pagination properties if they exist in the API response
+}
+
+interface LeaderContent {
+  id: number;
+  name: string;
+  description: string;
+  likes: number;
+  dislikes: number;
+  numberOfFaults: number;
+  voteStatus?: "LIKED" | "DISLIKED" | null;
+}
+
+interface LeadersApiResponse {
+  content: LeaderContent[];
+  pagination: PaginationData;
+  // Add other top-level properties if they exist in the API response
+}
+
 // Leaders API
-export const getLeaders = async () => {
+export const getLeaders = async (page: number = 0, limit: number = 5): Promise<LeadersApiResponse> => {
   const token = getAuthToken();
   const headers: Record<string, string> = {};
   
@@ -19,7 +41,7 @@ export const getLeaders = async () => {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/leaders`, {
+  const response = await fetch(`${API_BASE_URL}/leaders?page=${page}&limit=${limit}`, {
     headers,
   });
   if (!response.ok) {
@@ -28,12 +50,24 @@ export const getLeaders = async () => {
   return response.json();
 };
 
-export const searchLeaders = async (query: string) => {
-  const response = await fetch(`${API_BASE_URL}/leaders/search?query=${encodeURIComponent(query)}`);
+export const searchLeaders = async (query: string): Promise<LeaderContent[]> => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/leaders/search?query=${encodeURIComponent(query)}`, {
+    headers,
+  });
+
   if (!response.ok) {
     throw new Error("Failed to search leaders");
   }
-  return response.json();
+
+  const leaders: LeaderContent[] = await response.json();
+  return leaders;
 };
 
 export const getLeader = async (id: string) => {
@@ -52,11 +86,9 @@ export const getLeader = async (id: string) => {
   return response.json();
 };
 
-export const createLeader = async (name: string, description: string) => {
+export const createLeader = async (formData: FormData) => {
   const token = getAuthToken();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
   
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -65,7 +97,7 @@ export const createLeader = async (name: string, description: string) => {
   const response = await fetch(`${API_BASE_URL}/leaders`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ name, description }),
+    body: formData,
   });
   if (!response.ok) {
     throw new Error("Failed to create leader");
@@ -146,7 +178,7 @@ export const dislikeLeader = async (id: string) => {
 };
 
 // Faults API
-export const getFaults = async () => {
+export const getFaults = async (page: number = 0, limit: number = 5) => {
   const token = getAuthToken();
   const headers: Record<string, string> = {};
   
@@ -154,7 +186,7 @@ export const getFaults = async () => {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/faults`, {
+  const response = await fetch(`${API_BASE_URL}/faults?page=${page}&limit=${limit}`, {
     headers,
   });
   if (!response.ok) {
@@ -182,7 +214,7 @@ export const getFault = async (id: string) => {
   return response.json();
 };
 
-export const getLeaderFaults = async (leaderId: string) => {
+export const getLeaderFaults = async (leaderId: string, page: number = 0, limit: number = 5) => {
   const token = getAuthToken();
   const headers: Record<string, string> = {};
   
@@ -190,7 +222,7 @@ export const getLeaderFaults = async (leaderId: string) => {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/leaders/${leaderId}/faults`, {
+  const response = await fetch(`${API_BASE_URL}/leaders/${leaderId}/faults?page=${page}&limit=${limit}`, {
     headers,
   });
   if (!response.ok) {
@@ -199,11 +231,9 @@ export const getLeaderFaults = async (leaderId: string) => {
   return response.json();
 };
 
-export const createFault = async (title: string, description: string, leaderIds: number[], imageUrl?: string) => {
+export const createFault = async (formData: FormData) => {
   const token = getAuthToken();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const headers: Record<string, string> = {};
   
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -212,7 +242,7 @@ export const createFault = async (title: string, description: string, leaderIds:
   const response = await fetch(`${API_BASE_URL}/faults`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ title, description, imageUrl, leaderIds }),
+    body: formData,
   });
   if (!response.ok) {
     throw new Error("Failed to create fault");

@@ -2,12 +2,21 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AddFaultForm from "@/components/add-fault-form";
 import { getFaults, likeFault, dislikeFault } from "@/lib/api";
 import { toast } from "sonner";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Define types for our data
 interface Leader {
@@ -24,181 +33,239 @@ interface Fault {
   dislikes: number;
   percentageLiked: number;
   voteStatus?: "liked" | "disliked" | "none";
-  leaders: Leader[]; // Add leaders field
+  leaders: Leader[];
 }
 
 export default function Home() {
   const [faults, setFaults] = useState<Fault[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const limit = 5; // Number of items per page
 
-  const fetchFaults = async () => {
+  const fetchFaults = useCallback(async (page: number) => {
+    setLoading(true);
     try {
-      const data = await getFaults();
-      setFaults(data);
+      const data = await getFaults(page, limit);
+      setFaults(data.content);
+      setTotalPages(data.pagination.pageCount);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching faults:", error);
       setLoading(false);
     }
-  };
+  }, [limit]);
 
   useEffect(() => {
-    fetchFaults();
-  }, []);
+    fetchFaults(currentPage);
+  }, [currentPage, fetchFaults]);
+
+  const handleFaultAdded = () => {
+    fetchFaults(currentPage);
+  };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading faults...</div>;
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading Faults...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      
-      <AddFaultForm onFaultAdded={fetchFaults} />
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {faults.map((fault) => (
-          <Card key={fault.id} className="flex flex-col">
-            {fault.imageUrl && (
-              <div className="aspect-video relative">
-                <img 
-                  src={fault.imageUrl} 
-                  alt={fault.title} 
-                  className="w-full h-full object-cover rounded-t-lg"
-                />
-              </div>
-            )}
-            <CardHeader>
-              <CardTitle>{fault.title}</CardTitle>
-              <CardDescription>Fault Description</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p>{fault.description}</p>
-              {fault.leaders && fault.leaders.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-semibold mb-2">Leaders Responsible:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {fault.leaders.map((leader) => (
-                      <Link key={leader.id} href={`/leaders/${leader.id}`} passHref>
-                        <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 hover:bg-gray-100 cursor-pointer">
-                          {leader.name}
-                        </span>
-                      </Link>
-                    ))}
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-6">
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient-primary">
+            Hold Leaders Accountable
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+            Report, track, and vote on leadership accountability. Your voice matters in building better governance.
+          </p>
+        </div>
+
+        <AddFaultForm onFaultAdded={handleFaultAdded} />
+        
+        {faults.length === 0 && !loading ? (
+          <p className="text-center text-muted-foreground">No faults found.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {faults.map((fault) => (
+              <Card key={fault.id} className="glass-card floating-card compact-padding overflow-hidden">
+                {fault.imageUrl && (
+                  <div className="aspect-video relative -m-3 mb-3 rounded-lg overflow-hidden">
+                    <img 
+                      src={fault.imageUrl} 
+                      alt={fault.title} 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>
-                </div>
-              )}
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <div className="flex justify-between items-center w-full">
-                <div className="flex space-x-3">
-                  <span className="bg-blue-100 text-blue-800 px-3 py-2 rounded text-sm flex items-center gap-1">
-                    {fault.percentageLiked.toFixed(0)}% Liked
-                  </span>
-                  <span className="bg-green-100 text-green-800 px-3 py-2 rounded text-sm flex items-center gap-1">
-                    <ThumbsUp size={16} />
-                    {fault.likes}
-                  </span>
-                  <span className="bg-red-100 text-red-800 px-3 py-2 rounded text-sm flex items-center gap-1">
-                    <ThumbsDown size={16} />
-                    {fault.dislikes}
-                  </span>
-                </div>
-              </div>
-              <div className="flex space-x-3 w-full">
-                <Button 
-                  onClick={async () => {
-                    try {
-                      await likeFault(fault.id.toString());
-                      
-                      // Update local state
-                      setFaults(prevFaults => 
-                        prevFaults.map(f => 
-                          f.id === fault.id 
-                            ? {
-                                ...f,
-                                voteStatus: f.voteStatus === "liked" ? "none" : "liked",
-                                likes: f.voteStatus === "liked" ? f.likes - 1 : 
-                                       f.voteStatus === "disliked" ? f.likes + 1 : f.likes + 1,
-                                dislikes: f.voteStatus === "disliked" ? f.dislikes - 1 : f.dislikes,
-                                percentageLiked: f.voteStatus === "liked" 
-                                  ? (f.likes - 1) / Math.max(1, (f.likes - 1) + f.dislikes) * 100
-                                  : f.voteStatus === "disliked"
-                                  ? (f.likes + 1) / Math.max(1, (f.likes + 1) + (f.dislikes - 1)) * 100
-                                  : (f.likes + 1) / Math.max(1, (f.likes + 1) + f.dislikes) * 100
-                              }
-                            : f
-                        )
-                      );
-                      
-                      toast.success("Fault liked successfully!");
-                    } catch (error: unknown) {
-                      console.error("Error liking fault:", error);
-                      if (error instanceof Error) {
-                        toast.error(error.message || "Failed to like fault. Please try again.");
-                      } else {
-                        toast.error("Failed to like fault. Please try again.");
-                      }
-                    }
-                  }} 
-                  variant={fault.voteStatus === "liked" ? "default" : "outline"}
-                  className={`flex-1 flex items-center gap-2 ${
-                    fault.voteStatus === "liked" 
-                      ? "bg-green-600 hover:bg-green-700 text-white" 
-                      : "hover:bg-green-50 hover:text-green-700 hover:border-green-300"
-                  }`}
-                >
-                  <ThumbsUp size={18} />
-                  {fault.voteStatus === "liked" ? "Liked" : "Like"}
-                </Button>
-                <Button 
-                  variant={fault.voteStatus === "disliked" ? "default" : "outline"} 
-                  onClick={async () => {
-                    try {
-                      await dislikeFault(fault.id.toString());
-                      
-                      // Update local state
-                      setFaults(prevFaults => 
-                        prevFaults.map(f => 
-                          f.id === fault.id 
-                            ? {
-                                ...f,
-                                voteStatus: f.voteStatus === "disliked" ? "none" : "disliked",
-                                dislikes: f.voteStatus === "disliked" ? f.dislikes - 1 : 
-                                         f.voteStatus === "liked" ? f.dislikes + 1 : f.dislikes + 1,
-                                likes: f.voteStatus === "liked" ? f.likes - 1 : f.likes,
-                                percentageLiked: f.voteStatus === "disliked" 
-                                  ? f.likes / Math.max(1, f.likes + (f.dislikes - 1)) * 100
-                                  : f.voteStatus === "liked"
-                                  ? (f.likes - 1) / Math.max(1, (f.likes - 1) + (f.dislikes + 1)) * 100
-                                  : f.likes / Math.max(1, f.likes + (f.dislikes + 1)) * 100
-                              }
-                            : f
-                        )
-                      );
-                      
-                      toast.success("Fault disliked successfully!");
-                    } catch (error: unknown) {
-                      console.error("Error disliking fault:", error);
-                      if (error instanceof Error) {
-                        toast.error(error.message || "Failed to dislike fault. Please try again.");
-                      } else {
-                        toast.error("Failed to dislike fault. Please try again.");
-                      }
-                    }
-                  }}
-                  className={`flex-1 flex items-center gap-2 ${
-                    fault.voteStatus === "disliked" 
-                      ? "bg-red-600 hover:bg-red-700 text-white" 
-                      : "hover:bg-red-50 hover:text-red-700 hover:border-red-300"
-                  }`}
-                >
-                  <ThumbsDown size={18} />
-                  {fault.voteStatus === "disliked" ? "Disliked" : "Dislike"}
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
+                )}
+                
+                <CardHeader className="compact-padding-sm">
+                  <CardTitle className="text-lg font-semibold line-clamp-2">{fault.title}</CardTitle>
+                </CardHeader>
+                
+                <CardContent className="compact-padding-sm">
+                  <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{fault.description}</p>
+                  
+                  {fault.leaders && fault.leaders.length > 0 && (
+                    <div className="mb-3">
+                      <h4 className="text-xs font-medium mb-2 text-muted-foreground">Leaders Involved:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {fault.leaders.map((leader) => (
+                          <Link key={leader.id} href={`/leaders/${leader.id}`} passHref>
+                            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary hover:bg-primary/20 cursor-pointer transition-colors">
+                              {leader.name}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Vote Statistics */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2 text-xs">
+                      <div className="flex items-center space-x-1 bg-success-green/10 text-success-green px-2 py-1 rounded-full">
+                        <TrendingUp className="h-3 w-3" />
+                        <span>{fault.percentageLiked.toFixed(0)}%</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-muted-foreground">
+                        <ThumbsUp className="h-3 w-3" />
+                        <span>{fault.likes}</span>
+                      </div>
+                      <div className="flex items-center space-x-1 text-muted-foreground">
+                        <ThumbsDown className="h-3 w-3" />
+                        <span>{fault.dislikes}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                
+                <CardFooter className="compact-padding-sm">
+                  <div className="flex space-x-2 w-full">
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          await likeFault(fault.id.toString());
+                          setFaults((prevFaults) =>
+                            prevFaults.map((f) =>
+                              f.id === fault.id
+                                ? {
+                                    ...f,
+                                    voteStatus: f.voteStatus === "liked" ? "none" : "liked",
+                                    likes: f.voteStatus === "liked" ? f.likes - 1 : f.likes + 1,
+                                    dislikes: f.voteStatus === "disliked" ? f.dislikes - 1 : f.dislikes,
+                                    percentageLiked:
+                                      f.voteStatus === "liked"
+                                        ? ((f.likes - 1) / Math.max(1, f.likes - 1 + f.dislikes)) * 100
+                                        : ((f.likes + 1) / Math.max(1, f.likes + 1 + (f.voteStatus === "disliked" ? f.dislikes - 1 : f.dislikes))) * 100,
+                                  }
+                                : f
+                            )
+                          );
+                          toast.success("Vote recorded successfully!");
+                        } catch (error: unknown) {
+                          console.error("Error voting:", error);
+                          toast.error("Failed to record vote. Please try again.");
+                        }
+                      }}
+                      variant={fault.voteStatus === "liked" ? "default" : "outline"}
+                      size="sm"
+                      className={`flex-1 modern-button ${
+                        fault.voteStatus === "liked"
+                          ? "gradient-success text-white border-0"
+                          : "hover:bg-success-green/10 hover:text-success-green hover:border-success-green/30"
+                      }`}
+                    >
+                      <ThumbsUp className="h-4 w-4 mr-1" />
+                      {fault.voteStatus === "liked" ? "Agreed" : "Agree"}
+                    </Button>
+
+                    <Button
+                      variant={fault.voteStatus === "disliked" ? "default" : "outline"}
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await dislikeFault(fault.id.toString());
+                          setFaults((prevFaults) =>
+                            prevFaults.map((f) =>
+                              f.id === fault.id
+                                ? {
+                                    ...f,
+                                    voteStatus: f.voteStatus === "disliked" ? "none" : "disliked",
+                                    dislikes: f.voteStatus === "disliked" ? f.dislikes - 1 : f.dislikes + 1,
+                                    likes: f.voteStatus === "liked" ? f.likes - 1 : f.likes,
+                                    percentageLiked:
+                                      f.voteStatus === "disliked"
+                                        ? (f.likes / Math.max(1, f.likes + f.dislikes - 1)) * 100
+                                        : (f.likes / Math.max(1, f.likes + f.dislikes + 1)) * 100,
+                                  }
+                                : f
+                            )
+                          );
+                          toast.success("Vote recorded successfully!");
+                        } catch (error: unknown) {
+                          console.error("Error voting:", error);
+                          toast.error("Failed to record vote. Please try again.");
+                        }
+                      }}
+                      className={`flex-1 modern-button ${
+                        fault.voteStatus === "disliked"
+                          ? "bg-destructive hover:bg-destructive/90 text-white border-0"
+                          : "hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                      }`}
+                    >
+                      <ThumbsDown className="h-4 w-4 mr-1" />
+                      {fault.voteStatus === "disliked" ? "Disagreed" : "Disagree"}
+                    </Button>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
+        {totalPages > 1 && (
+          <Pagination className="mt-8">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+                  aria-disabled={currentPage === 0}
+                  tabIndex={currentPage === 0 ? -1 : undefined}
+                  className={currentPage === 0 ? "pointer-events-none opacity-50" : undefined}
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    href="#"
+                    isActive={i === currentPage}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))}
+                  aria-disabled={currentPage === totalPages - 1}
+                  tabIndex={currentPage === totalPages - 1 ? -1 : undefined}
+                  className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : undefined}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   );
