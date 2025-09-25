@@ -6,8 +6,9 @@ import { ThumbsUp, ThumbsDown, TrendingUp, ArrowLeft, FileText } from "lucide-re
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image"; // Import Image component
 import AddFaultForm from "@/components/add-fault-form";
-import { getLeader, getLeaderFaults, likeLeader, dislikeLeader, likeFault, dislikeFault } from "@/lib/api";
+import { getLeader, getLeaderFaults, likeLeader, dislikeLeader, likeFault, dislikeFault, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import { toast } from "sonner";
 import {
   Pagination,
@@ -38,6 +39,7 @@ interface Leader {
   likes: number;
   dislikes: number;
   numberOfFaults: number;
+  imageUrl?: string; // Add imageUrl to the Leader interface
   voteStatus?: "LIKED" | "DISLIKED" | null;
 }
 
@@ -53,7 +55,7 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
 
   const fetchLeader = async () => {
     try {
-      const data = await getLeader(params.id);
+      const data = await getLeader(params.id); // Re-add this line
       setLeader(data);
     } catch (error) {
       console.error("Error fetching leader:", error);
@@ -88,6 +90,10 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
   };
 
   const handleLike = async () => {
+    if (!getAuthToken()) {
+      router.push("/login");
+      return;
+    }
     try {
       await likeLeader(params.id);
       setLeader((prevLeader) => {
@@ -107,6 +113,10 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
   };
 
   const handleDislike = async () => {
+    if (!getAuthToken()) {
+      router.push("/login");
+      return;
+    }
     try {
       await dislikeLeader(params.id);
       setLeader((prevLeader) => {
@@ -164,6 +174,18 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
         
         {/* Leader Profile Card */}
         <Card className="glass-card compact-padding mb-8">
+          {leader.imageUrl && (
+            <div className="relative w-full h-60 rounded-t-xl overflow-hidden">
+              <Image
+                src={leader.imageUrl}
+                alt={leader.name}
+                layout="fill"
+                objectFit="cover"
+                className="absolute inset-0"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+            </div>
+          )}
           <CardHeader className="compact-padding-sm">
             <div className="flex items-start justify-between">
               <div>
@@ -295,6 +317,10 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
                   <div className="flex space-x-2 w-full">
                     <Button 
                       onClick={async () => {
+                        if (!getAuthToken()) {
+                          router.push("/login");
+                          return;
+                        }
                         try {
                           await likeFault(fault.id.toString());
                           setFaults((prevFaults) =>
@@ -334,6 +360,10 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
                       variant={fault.voteStatus === "DISLIKED" ? "default" : "outline"} 
                       size="sm"
                       onClick={async () => {
+                        if (!getAuthToken()) {
+                          router.push("/login");
+                          return;
+                        }
                         try {
                           await dislikeFault(fault.id.toString());
                           setFaults((prevFaults) =>

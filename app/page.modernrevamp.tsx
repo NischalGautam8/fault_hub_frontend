@@ -8,77 +8,11 @@ import { useState } from "react";
 
 // Mock data for preview
 const mockFaults = [
-  {
-    id: 1,
-    title: "Misuse of Public Funds for Personal Travel",
-    description: "Evidence suggests inappropriate use of taxpayer money for personal vacation expenses, violating public trust and ethical guidelines.",
-    imageUrl: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=500&h=300&fit=crop",
-    likes: 234,
-    dislikes: 45,
-    percentageLiked: 83.9,
-    voteStatus: "none" as const,
-    leaders: [
-      { id: 1, name: "John Mayor" },
-      { id: 2, name: "Sarah Governor" }
-    ]
-  },
-  {
-    id: 2,
-    title: "Failure to Address Infrastructure Crisis",
-    description: "Despite multiple warnings and allocated budget, critical infrastructure repairs have been delayed for over 18 months.",
-    imageUrl: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=500&h=300&fit=crop",
-    likes: 189,
-    dislikes: 67,
-    percentageLiked: 73.8,
-    voteStatus: "liked" as const,
-    leaders: [
-      { id: 3, name: "Mike Director" }
-    ]
-  },
-  {
-    id: 3,
-    title: "Lack of Transparency in Contract Bidding",
-    description: "Multiple contracts awarded without proper public bidding process, raising concerns about favoritism and corruption.",
-    imageUrl: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=500&h=300&fit=crop",
-    likes: 156,
-    dislikes: 89,
-    percentageLiked: 63.7,
-    voteStatus: "none" as const,
-    leaders: [
-      { id: 1, name: "John Mayor" },
-      { id: 4, name: "Lisa Commissioner" }
-    ]
-  }
+ 
 ];
 
 const mockLeaders = [
-  {
-    id: 1,
-    name: "John Mayor",
-    description: "Mayor of Springfield",
-    likes: 145,
-    dislikes: 89,
-    numberOfFaults: 5,
-    voteStatus: "LIKED" as const
-  },
-  {
-    id: 2,
-    name: "Sarah Governor",
-    description: "State Governor",
-    likes: 234,
-    dislikes: 123,
-    numberOfFaults: 3,
-    voteStatus: null
-  },
-  {
-    id: 3,
-    name: "Mike Director",
-    description: "Public Works Director",
-    likes: 67,
-    dislikes: 45,
-    numberOfFaults: 2,
-    voteStatus: "DISLIKED" as const
-  }
+  
 ];
 
 // Header Component

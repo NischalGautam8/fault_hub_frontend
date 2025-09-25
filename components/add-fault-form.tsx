@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect, useRef } from "react";
-import { createFault, searchLeaders } from "@/lib/api";
+import { useRouter } from "next/navigation"; // Import useRouter
+import { createFault, searchLeaders, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import { Plus, X, Search, AlertCircle } from "lucide-react";
 
 interface Leader {
@@ -32,6 +33,15 @@ export default function AddFaultForm({ onFaultAdded }: AddFaultFormProps) {
   
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter(); // Initialize useRouter
+
+  const handleReportClick = () => {
+    if (!getAuthToken()) {
+      router.push("/login");
+      return;
+    }
+    setShowFullForm(true);
+  };
 
   // Debounced search function
   useEffect(() => {
@@ -155,12 +165,12 @@ export default function AddFaultForm({ onFaultAdded }: AddFaultFormProps) {
                   setShowFullForm(true);
                 }
               }}
-              onFocus={() => setShowFullForm(true)}
+              onFocus={() => handleReportClick()}
               className="flex-grow bg-white/50 border-white/30 focus:bg-white/80 transition-all"
             />
             
             <Button 
-              onClick={() => setShowFullForm(true)}
+              onClick={() => handleReportClick()}
               disabled={showFullForm}
               className="modern-button gradient-primary text-white border-0"
             >

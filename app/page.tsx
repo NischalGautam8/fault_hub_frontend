@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 import AddFaultForm from "@/components/add-fault-form";
-import { getFaults, likeFault, dislikeFault } from "@/lib/api";
+import { getFaults, likeFault, dislikeFault, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import { toast } from "sonner";
 import {
   Pagination,
@@ -37,6 +38,7 @@ interface Fault {
 }
 
 export default function Home() {
+  const router = useRouter(); // Initialize useRouter
   const [faults, setFaults] = useState<Fault[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -152,6 +154,10 @@ export default function Home() {
                   <div className="flex space-x-2 w-full">
                     <Button 
                       onClick={async () => {
+                        if (!getAuthToken()) {
+                          router.push("/login");
+                          return;
+                        }
                         try {
                           await likeFault(fault.id.toString());
                           setFaults((prevFaults) =>
@@ -192,6 +198,10 @@ export default function Home() {
                       variant={fault.voteStatus === "disliked" ? "default" : "outline"}
                       size="sm"
                       onClick={async () => {
+                        if (!getAuthToken()) {
+                          router.push("/login");
+                          return;
+                        }
                         try {
                           await dislikeFault(fault.id.toString());
                           setFaults((prevFaults) =>

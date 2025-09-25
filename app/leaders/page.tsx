@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown, FileText, Eye } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 import Image from "next/image";
 import AddLeaderForm from "@/components/add-leader-form";
-import { getLeaders, likeLeader, dislikeLeader, searchLeaders } from "@/lib/api";
+import { getLeaders, likeLeader, dislikeLeader, searchLeaders, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import {
   Pagination,
   PaginationContent,
@@ -32,6 +33,7 @@ interface Leader {
 }
 
 export default function LeadersPage() {
+  const router = useRouter(); // Initialize useRouter
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -98,6 +100,10 @@ export default function LeadersPage() {
   };
 
   const handleLike = async (leaderId: number) => {
+    if (!getAuthToken()) {
+      router.push("/login");
+      return;
+    }
     try {
       await likeLeader(leaderId.toString());
       setLeaders((prevLeaders) =>
@@ -118,6 +124,10 @@ export default function LeadersPage() {
   };
 
   const handleDislike = async (leaderId: number) => {
+    if (!getAuthToken()) {
+      router.push("/login");
+      return;
+    }
     try {
       await dislikeLeader(leaderId.toString());
       setLeaders((prevLeaders) =>

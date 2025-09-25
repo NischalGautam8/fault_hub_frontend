@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useRef } from "react";
-import { createLeader } from "@/lib/api";
+import { useRouter } from "next/navigation"; // Import useRouter
+import { createLeader, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import { UserPlus, AlertCircle } from "lucide-react";
 
 interface AddLeaderFormProps {
@@ -20,6 +21,15 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
   const [success, setSuccess] = useState("");
   const [showForm, setShowForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter(); // Initialize useRouter
+
+  const handleAddLeaderClick = () => {
+    if (!getAuthToken()) {
+      router.push("/login");
+      return;
+    }
+    setShowForm(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +69,7 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
 
   return (
     <div className="">
-      <div className="glass-card p-6 rounded-xl">
+      <div className="glass-card  rounded-xl">
         {success && (
           <div className="flex items-center  space-x-2 text-success-green bg-success-green/10 p-3 rounded-lg mb-4">
             <AlertCircle className="h-4 w-4" />
@@ -68,9 +78,9 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
         )}
 
         {!showForm ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center  justify-center h-full">
             <Button 
-              onClick={() => setShowForm(true)}
+              onClick={handleAddLeaderClick}
               className="modern-button gradient-secondary text-white border-0"
             >
               <UserPlus className="h-4 w-4 mr-2" />
@@ -78,7 +88,7 @@ export default function AddLeaderForm({ onLeaderAdded }: AddLeaderFormProps) {
             </Button>
           </div>
         ) : (
-          <div>
+          <div className="p-6">
             <div className="flex items-center space-x-2 mb-4">
               <UserPlus className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold">Add New Leader</h2>
