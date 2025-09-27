@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, FileText, Eye } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Eye } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
@@ -12,7 +12,6 @@ import { getLeaders, likeLeader, dislikeLeader, searchLeaders, getAuthToken } fr
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,

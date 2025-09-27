@@ -2,16 +2,40 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, TrendingUp, Scale, Users, Home, LogIn, UserPlus, Plus, X, Search, AlertCircle, FileText, Eye, ArrowLeft } from "lucide-react";
+import { ThumbsUp, ThumbsDown, TrendingUp, Scale, Users, Home, LogIn, UserPlus, Plus, X, Search, FileText, Eye, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import Image from "next/image";
+
+// Define interfaces for our data structures
+interface Leader {
+  id: number;
+  name: string;
+  description: string;
+  numberOfFaults: number;
+  likes: number;
+  dislikes: number;
+  voteStatus: "LIKED" | "DISLIKED" | null;
+}
+
+interface Fault {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+  leaders: Leader[];
+  likes: number;
+  dislikes: number;
+  percentageLiked: number;
+  voteStatus: "liked" | "disliked" | null;
+}
 
 // Mock data for preview
-const mockFaults = [
+const mockFaults: Fault[] = [
  
 ];
 
-const    = [
+const mockLeaders: Leader[] = [
   
 ];
 
@@ -168,7 +192,7 @@ function ModernAddFaultForm() {
 
 export default function ModernRevampPreview() {
   const [currentView, setCurrentView] = useState<'home' | 'leaders' | 'leader-detail'>('home');
-  const [selectedLeader, setSelectedLeader] = useState( [0]);
+  const [selectedLeader, setSelectedLeader] = useState<Leader | null>(null);
 
   return (
     <div className="min-h-screen">
@@ -219,10 +243,11 @@ export default function ModernRevampPreview() {
             {mockFaults.map((fault) => (
               <Card key={fault.id} className="glass-card floating-card compact-padding overflow-hidden">
                 <div className="aspect-video relative -m-3 mb-3 rounded-lg overflow-hidden">
-                  <img 
-                    src={fault.imageUrl} 
-                    alt={fault.title} 
-                    className="w-full h-full object-cover"
+                  <Image
+                    src={fault.imageUrl}
+                    alt={fault.title}
+                    layout="fill"
+                    objectFit="cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
@@ -320,7 +345,7 @@ export default function ModernRevampPreview() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            { .map((leader) => (
+            {mockLeaders.map((leader) => (
               <Card key={leader.id} className="glass-card floating-card compact-padding">
                 <CardHeader className="compact-padding-sm">
                   <div className="flex items-start justify-between">
@@ -410,136 +435,141 @@ export default function ModernRevampPreview() {
             </Button>
           </div>
           
-          <Card className="glass-card compact-padding mb-8">
-            <CardHeader className="compact-padding-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-2xl font-bold">{selectedLeader.name}</CardTitle>
-                  <CardDescription className="text-base mt-1">{selectedLeader.description}</CardDescription>
-                </div>
-                <div className="flex items-center space-x-1 bg-muted/50 px-3 py-2 rounded-full">
-                  <FileText className="h-4 w-4" />
-                  <span className="font-medium">{selectedLeader.numberOfFaults}</span>
-                  <span className="text-xs text-muted-foreground">Faults</span>
-                </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="compact-padding-sm">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="flex items-center space-x-1 bg-success-green/10 text-success-green px-3 py-2 rounded-full">
-                  <ThumbsUp className="h-4 w-4" />
-                  <span className="font-medium">{selectedLeader.likes}</span>
-                  <span className="text-sm">Support</span>
-                </div>
-                <div className="flex items-center space-x-1 bg-destructive/10 text-destructive px-3 py-2 rounded-full">
-                  <ThumbsDown className="h-4 w-4" />
-                  <span className="font-medium">{selectedLeader.dislikes}</span>
-                  <span className="text-sm">Opposition</span>
-                </div>
-              </div>
-            </CardContent>
-            
-            <CardFooter className="compact-padding-sm">
-              <div className="flex space-x-3 w-full">
-                <Button 
-                  variant={selectedLeader.voteStatus === "LIKED" ? "default" : "outline"}
-                  className={`flex-1 modern-button ${
-                    selectedLeader.voteStatus === "LIKED" 
-                      ? "gradient-success text-white border-0" 
-                      : "hover:bg-success-green/10 hover:text-success-green hover:border-success-green/30"
-                  }`}
-                >
-                  <ThumbsUp className="h-4 w-4 mr-2" />
-                  {selectedLeader.voteStatus === "LIKED" ? "Supported" : "Support"}
-                </Button>
-                <Button 
-                  variant={selectedLeader.voteStatus === "DISLIKED" ? "default" : "outline"} 
-                  className={`flex-1 modern-button ${
-                    selectedLeader.voteStatus === "DISLIKED" 
-                      ? "bg-destructive hover:bg-destructive/90 text-white border-0" 
-                      : "hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
-                  }`}
-                >
-                  <ThumbsDown className="h-4 w-4 mr-2" />
-                  {selectedLeader.voteStatus === "DISLIKED" ? "Opposed" : "Oppose"}
-                </Button>
-              </div>
-            </CardFooter>
-          </Card>
-
-          <h2 className="text-2xl font-bold mb-6">Faults By {selectedLeader.name}</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockFaults.filter(fault => 
-              fault.leaders.some(leader => leader.name === selectedLeader.name)
-            ).map((fault) => (
-              <Card key={fault.id} className="glass-card floating-card compact-padding">
-                <div className="aspect-video relative -m-3 mb-3 rounded-lg overflow-hidden">
-                  <img 
-                    src={fault.imageUrl} 
-                    alt={fault.title} 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                </div>
-                
+          {selectedLeader && (
+            <>
+              <Card className="glass-card compact-padding mb-8">
                 <CardHeader className="compact-padding-sm">
-                  <CardTitle className="text-lg font-semibold line-clamp-2">{fault.title}</CardTitle>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl font-bold">{selectedLeader.name}</CardTitle>
+                      <CardDescription className="text-base mt-1">{selectedLeader.description}</CardDescription>
+                    </div>
+                    <div className="flex items-center space-x-1 bg-muted/50 px-3 py-2 rounded-full">
+                      <FileText className="h-4 w-4" />
+                      <span className="font-medium">{selectedLeader.numberOfFaults}</span>
+                      <span className="text-xs text-muted-foreground">Faults</span>
+                    </div>
+                  </div>
                 </CardHeader>
-                
+
                 <CardContent className="compact-padding-sm">
-                  <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{fault.description}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 text-xs">
-                      <div className="flex items-center space-x-1 bg-success-green/10 text-success-green px-2 py-1 rounded-full">
-                        <TrendingUp className="h-3 w-3" />
-                        <span>{fault.percentageLiked.toFixed(0)}%</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-muted-foreground">
-                        <ThumbsUp className="h-3 w-3" />
-                        <span>{fault.likes}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-muted-foreground">
-                        <ThumbsDown className="h-3 w-3" />
-                        <span>{fault.dislikes}</span>
-                      </div>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="flex items-center space-x-1 bg-success-green/10 text-success-green px-3 py-2 rounded-full">
+                      <ThumbsUp className="h-4 w-4" />
+                      <span className="font-medium">{selectedLeader.likes}</span>
+                      <span className="text-sm">Support</span>
+                    </div>
+                    <div className="flex items-center space-x-1 bg-destructive/10 text-destructive px-3 py-2 rounded-full">
+                      <ThumbsDown className="h-4 w-4" />
+                      <span className="font-medium">{selectedLeader.dislikes}</span>
+                      <span className="text-sm">Opposition</span>
                     </div>
                   </div>
                 </CardContent>
-                
+
                 <CardFooter className="compact-padding-sm">
-                  <div className="flex space-x-2 w-full">
-                    <Button 
-                      variant={fault.voteStatus === "liked" ? "default" : "outline"}
-                      size="sm"
+                  <div className="flex space-x-3 w-full">
+                    <Button
+                      variant={selectedLeader.voteStatus === "LIKED" ? "default" : "outline"}
                       className={`flex-1 modern-button ${
-                        fault.voteStatus === "liked" 
-                          ? "gradient-success text-white border-0" 
+                        selectedLeader.voteStatus === "LIKED"
+                          ? "gradient-success text-white border-0"
                           : "hover:bg-success-green/10 hover:text-success-green hover:border-success-green/30"
                       }`}
                     >
-                      <ThumbsUp className="h-4 w-4 mr-1" />
-                      {fault.voteStatus === "liked" ? "Agreed" : "Agree"}
+                      <ThumbsUp className="h-4 w-4 mr-2" />
+                      {selectedLeader.voteStatus === "LIKED" ? "Supported" : "Support"}
                     </Button>
-                    <Button 
-                      variant={fault.voteStatus === "disliked" ? "default" : "outline"} 
-                      size="sm"
+                    <Button
+                      variant={selectedLeader.voteStatus === "DISLIKED" ? "default" : "outline"}
                       className={`flex-1 modern-button ${
-                        fault.voteStatus === "disliked" 
-                          ? "bg-destructive hover:bg-destructive/90 text-white border-0" 
+                        selectedLeader.voteStatus === "DISLIKED"
+                          ? "bg-destructive hover:bg-destructive/90 text-white border-0"
                           : "hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
                       }`}
                     >
-                      <ThumbsDown className="h-4 w-4 mr-1" />
-                      {fault.voteStatus === "disliked" ? "Disagreed" : "Disagree"}
+                      <ThumbsDown className="h-4 w-4 mr-2" />
+                      {selectedLeader.voteStatus === "DISLIKED" ? "Opposed" : "Oppose"}
                     </Button>
                   </div>
                 </CardFooter>
               </Card>
-            ))}
-          </div>
+
+              <h2 className="text-2xl font-bold mb-6">Faults By {selectedLeader.name}</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {mockFaults.filter(fault =>
+                  fault.leaders.some(leader => leader.name === selectedLeader.name)
+                ).map((fault) => (
+                  <Card key={fault.id} className="glass-card floating-card compact-padding">
+                    <div className="aspect-video relative -m-3 mb-3 rounded-lg overflow-hidden">
+                      <Image
+                        src={fault.imageUrl}
+                        alt={fault.title}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    </div>
+
+                    <CardHeader className="compact-padding-sm">
+                      <CardTitle className="text-lg font-semibold line-clamp-2">{fault.title}</CardTitle>
+                    </CardHeader>
+
+                    <CardContent className="compact-padding-sm">
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{fault.description}</p>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-xs">
+                          <div className="flex items-center space-x-1 bg-success-green/10 text-success-green px-2 py-1 rounded-full">
+                            <TrendingUp className="h-3 w-3" />
+                            <span>{fault.percentageLiked.toFixed(0)}%</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-muted-foreground">
+                            <ThumbsUp className="h-3 w-3" />
+                            <span>{fault.likes}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-muted-foreground">
+                            <ThumbsDown className="h-3 w-3" />
+                            <span>{fault.dislikes}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+
+                    <CardFooter className="compact-padding-sm">
+                      <div className="flex space-x-2 w-full">
+                        <Button
+                          variant={fault.voteStatus === "liked" ? "default" : "outline"}
+                          size="sm"
+                          className={`flex-1 modern-button ${
+                            fault.voteStatus === "liked"
+                              ? "gradient-success text-white border-0"
+                              : "hover:bg-success-green/10 hover:text-success-green hover:border-success-green/30"
+                          }`}
+                        >
+                          <ThumbsUp className="h-4 w-4 mr-1" />
+                          {fault.voteStatus === "liked" ? "Agreed" : "Agree"}
+                        </Button>
+                        <Button
+                          variant={fault.voteStatus === "disliked" ? "default" : "outline"}
+                          size="sm"
+                          className={`flex-1 modern-button ${
+                            fault.voteStatus === "disliked"
+                              ? "bg-destructive hover:bg-destructive/90 text-white border-0"
+                              : "hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                          }`}
+                        >
+                          <ThumbsDown className="h-4 w-4 mr-1" />
+                          {fault.voteStatus === "disliked" ? "Disagreed" : "Disagree"}
+                        </Button>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

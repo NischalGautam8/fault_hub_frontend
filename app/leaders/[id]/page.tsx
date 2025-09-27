@@ -7,13 +7,11 @@ import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; // Import Image component
-import AddFaultForm from "@/components/add-fault-form";
 import { getLeader, getLeaderFaults, likeLeader, dislikeLeader, likeFault, dislikeFault, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import { toast } from "sonner";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -82,12 +80,7 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
       fetchLeader();
       fetchFaults(currentFaultsPage);
     }
-  }, [params.id, currentFaultsPage, fetchFaults]);
-
-  const handleFaultAdded = () => {
-    fetchLeader();
-    fetchFaults(currentFaultsPage);
-  };
+  }, [params.id, currentFaultsPage, fetchLeader, fetchFaults]);
 
   const handleLike = async () => {
     if (!getAuthToken()) {
@@ -279,10 +272,11 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
               <Card key={fault.id} className="glass-card floating-card compact-padding">
                 {fault.imageUrl && (
                   <div className="aspect-video relative -m-3 mb-3 rounded-lg overflow-hidden">
-                    <img 
-                      src={fault.imageUrl} 
-                      alt={fault.title} 
-                      className="w-full h-full object-cover"
+                    <Image
+                      src={fault.imageUrl}
+                      alt={fault.title}
+                      layout="fill"
+                      objectFit="cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Scale, Users, Home, LogIn, UserPlus, Hammer } from "lucide-react";
+import { Scale, Users, Home, LogIn, UserPlus } from "lucide-react";
 
 export default function Header() {
   return (

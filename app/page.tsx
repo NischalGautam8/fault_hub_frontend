@@ -1,18 +1,18 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
+import Image from "next/image"; // Import Image component
 import AddFaultForm from "@/components/add-fault-form";
 import { getFaults, likeFault, dislikeFault, getAuthToken } from "@/lib/api"; // Import getAuthToken
 import { toast } from "sonner";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -100,10 +100,11 @@ export default function Home() {
               <Card key={fault.id} className="glass-card floating-card p-2 overflow-hidden"> {/* Changed compact-padding to p-2 */}
                 {fault.imageUrl && (
                   <div className="aspect-video relative -m-2 mb-2 rounded-lg overflow-hidden"> {/* Changed -m-3 mb-3 to -m-2 mb-2 */}
-                    <img 
-                      src={fault.imageUrl} 
-                      alt={fault.title} 
-                      className="w-full h-full object-cover"
+                    <Image
+                      src={fault.imageUrl}
+                      alt={fault.title}
+                      layout="fill"
+                      objectFit="cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>
