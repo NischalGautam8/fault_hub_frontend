@@ -1,6 +1,6 @@
 // API service to interact with the Spring Boot backend
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
 
 // Utility function to get JWT token from localStorage
 export const getAuthToken = () => { // Export getAuthToken
