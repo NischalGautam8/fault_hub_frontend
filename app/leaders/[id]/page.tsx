@@ -51,7 +51,7 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
   const faultsLimit = 5; // Number of faults per page
   const router = useRouter();
 
-  const fetchLeader = async () => {
+  const fetchLeader = useCallback(async () => {
     try {
       const data = await getLeader(params.id); // Re-add this line
       setLeader(data);
@@ -60,7 +60,7 @@ export default function LeaderDetailPage({ params }: { params: { id: string } })
     } finally {
       setLoadingLeader(false);
     }
-  };
+  }, [params.id]);
 
   const fetchFaults = useCallback(async (page: number) => {
     setLoadingFaults(true);
