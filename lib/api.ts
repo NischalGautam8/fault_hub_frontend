@@ -1,6 +1,6 @@
 // API service to interact with the Spring Boot backend
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Default to localhost for development
 
 // Utility function to get JWT token from localStorage
 export const getAuthToken = () => { // Export getAuthToken
@@ -179,6 +179,7 @@ export const dislikeLeader = async (id: string) => {
 
 // Faults API
 export const getFaults = async (page: number = 0, limit: number = 5) => {
+  console.log("API_BASE_URL:", API_BASE_URL); // Debug log
   const token = getAuthToken();
   const headers: Record<string, string> = {};
   
