@@ -13,7 +13,6 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as jwt from "../jwt.js";
 import type * as messages from "../messages.js";
 import type * as rooms from "../rooms.js";
 import type * as users from "../users.js";
@@ -27,7 +26,6 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  jwt: typeof jwt;
   messages: typeof messages;
   rooms: typeof rooms;
   users: typeof users;

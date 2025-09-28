@@ -1,11 +1,6 @@
-// Auth configuration for Convex
+// Auth configuration for Convex - No providers (manual auth)
 const authConfig = {
-  providers: [
-    {
-      domain: "localhost", // Use a static value or configure elsewhere
-      applicationID: "custom-jwt",
-    },
-  ],
+  providers: [],
 };
 
 export default authConfig;
