@@ -13,23 +13,23 @@ export function RoomItem({ room, selectedRoomId, setSelectedRoomId }: RoomItemPr
   const lastMessage = useQuery(api.messages.getLastMessage, { roomId: room._id });
   
   // Use displayName for DM rooms, otherwise use regular name
-  const displayName = (room as any).displayName || room.name;
+  const displayName = (room as Doc<"rooms"> & { displayName?: string }).displayName || room.name;
   const isDM = room.isprivate && room.members.length === 2;
 
   return (
     <div 
       key={room._id} 
-      className={`p-2 mb-1 rounded cursor-pointer ${selectedRoomId === room._id ? "bg-blue-100" : "hover:bg-gray-100"}`}
+      className={`p-3 mb-1 rounded-lg cursor-pointer transition-colors ${selectedRoomId === room._id ? "bg-sidebar-primary text-sidebar-primary-foreground" : "hover:bg-sidebar-accent"}`}
       onClick={() => {
         setSelectedRoomId(room._id);
       }}
     >
-      <div className="font-semibold">
-        {isDM ? displayName : `${room.name} ${room.isprivate ? "(Private)" : "(Public)"}`}
+      <div className="font-semibold text-sm">
+        {isDM ? displayName : `${room.name}`}
       </div>
       {lastMessage && (
-        <div className="text-sm text-gray-600">
-          {lastMessage.senderId}: {lastMessage.content} - {new Date(lastMessage.createdAt).toLocaleDateString()}
+        <div className={`text-xs truncate ${selectedRoomId === room._id ? "text-sidebar-primary-foreground/80" : "text-sidebar-foreground/60"}`}>
+          <strong>{lastMessage.senderId}:</strong> {lastMessage.content}
         </div>
       )}
     </div>

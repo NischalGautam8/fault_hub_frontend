@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Scale, Users, Home, LogIn, UserPlus } from "lucide-react";
+import { Scale, Users, Home, LogIn, UserPlus, MessageSquare } from "lucide-react";
 
 export default function Header() {
   return (
@@ -37,6 +37,10 @@ export default function Header() {
               </Link>
             </Button>
             <Button variant="ghost" size="sm" asChild className="modern-button">
+              <Link href="/chat" className="flex items-center space-x-2">
+                <MessageSquare className="h-4 w-4" />
+                <span className="hidden sm:inline">Chat</span>
+              </Link>
             </Button>
             <div className="h-4 w-px bg-border mx-2" />
             <Button variant="ghost" size="sm" asChild className="modern-button">
