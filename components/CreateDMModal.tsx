@@ -38,8 +38,8 @@ export function CreateDMModal({ isOpen, onClose, onDMCreated }: CreateDMModalPro
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-90vw">
+    <div className="fixed inset-0 bg-white bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl border p-6 w-96 max-w-90vw">
         <h2 className="text-xl font-semibold mb-4">Start New Direct Message</h2>
         
         <div className="mb-4">
