@@ -18,7 +18,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gradient-primary">
-                FaultsHub
+                FaultHub
               </h1>
               <p className="text-xs text-muted-foreground -mt-1">
                 Holding Leaders Accountable
