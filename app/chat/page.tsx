@@ -76,28 +76,9 @@ function ChatContent() {
     );
   }
 
-  const createTestRoomsMutation = useMutation(api.rooms.createTestRooms);
-  
-  const handleCreateTestRooms = async () => {
-    try {
-      await createTestRoomsMutation({});
-      console.log("Test rooms created");
-    } catch (error) {
-      console.error("Failed to create test rooms:", error);
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Chat</h2>
-        <button
-          onClick={handleCreateTestRooms}
-          className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
-        >
-          Create Test Rooms
-        </button>
-      </div>
+      <h2 className="text-2xl font-bold mb-4">Chat</h2>
       
       {/* Tab navigation */}
       <div className="flex border-b mb-4">
