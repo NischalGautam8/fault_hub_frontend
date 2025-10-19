@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Scale, Users, Home, LogIn, UserPlus, MessageSquare, Menu } from "lucide-react";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -56,6 +57,7 @@ export default function Header() {
                 <span className="hidden sm:inline">Chat</span>
               </Link>
             </Button>
+            <NotificationDropdown />
             <div className="h-4 w-px bg-border mx-2" />
             <Button variant="ghost" size="sm" asChild className="modern-button">
               <Link href="/login" className="flex items-center space-x-2">

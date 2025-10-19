@@ -1,8 +1,8 @@
 // API service to interact with the Spring Boot backend
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Default to localhost for development
-const API_BASE_URL = "https://faulthub-b8abh7fhancfbagk.malaysiawest-01.azurewebsites.net/api"; // Default to localhost for development
-// const API_BASE_URL = "http://localhost:8080/api"; // Default to localhost for development
+// const API_BASE_URL = "https://faulthub-b8abh7fhancfbagk.malaysiawest-01.azurewebsites.net/api"; // Default to localhost for development
+const API_BASE_URL = "http://localhost:8080/api"; // Default to localhost for development
 
 // Utility function to get JWT token from localStorage
 export const getAuthToken = () => { // Export getAuthToken
@@ -358,6 +358,115 @@ export const getUser = async (id: string) => {
   const response = await fetch(`${API_BASE_URL}/users/${id}`);
   if (!response.ok) {
     throw new Error("Failed to fetch user");
+  }
+  return response.json();
+};
+
+export const getCurrentUser = async () => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/auth/me`, { headers });
+  if (!response.ok) {
+    throw new Error("Failed to fetch current user");
+  }
+  return response.json();
+};
+
+// Notifications API
+export const getNotifications = async (page: number = 0, limit: number = 10, filter?: 'read' | 'unread') => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  let url = `${API_BASE_URL}/notifications?page=${page}&limit=${limit}`;
+  if (filter) {
+    url += `&filter=${filter}`;
+  }
+
+  const response = await fetch(url, { headers });
+  if (!response.ok) {
+    throw new Error("Failed to fetch notifications");
+  }
+  return response.json();
+};
+
+export const getUnreadCount = async (): Promise<number> => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/notifications/unread-count`, { headers });
+  if (!response.ok) {
+    throw new Error("Failed to fetch unread count");
+  }
+  const data = await response.json();
+  return data.count || 0;
+};
+
+export const markNotificationAsRead = async (id: number) => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
+    method: "PUT",
+    headers,
+  });
+  
+  if (!response.ok) {
+    throw new Error("Failed to mark notification as read");
+  }
+  return response.json();
+};
+
+export const markAllNotificationsAsRead = async () => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/notifications/mark-all-read`, {
+    method: "PUT",
+    headers,
+  });
+  
+  if (!response.ok) {
+    throw new Error("Failed to mark all notifications as read");
+  }
+  return response.json();
+};
+
+export const deleteNotification = async (id: number) => {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {};
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/notifications/${id}`, {
+    method: "DELETE",
+    headers,
+  });
+  
+  if (!response.ok) {
+    throw new Error("Failed to delete notification");
   }
   return response.json();
 };

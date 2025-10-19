@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import { Toaster } from "sonner";
 import { ConvexClientProvider } from "../components/ConvexClientProvider";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ConvexClientProvider>
-          <Header />
-          <main>{children}</main>
-          <Toaster position="bottom-right" />
+          <NotificationProvider>
+            <Header />
+            <main>{children}</main>
+            <Toaster position="bottom-right" />
+          </NotificationProvider>
         </ConvexClientProvider>
       </body>
     </html>
