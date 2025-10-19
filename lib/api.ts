@@ -2,7 +2,8 @@
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL; // Default to localhost for development
 // const API_BASE_URL = "https://faulthub-b8abh7fhancfbagk.malaysiawest-01.azurewebsites.net/api"; // Default to localhost for development
-const API_BASE_URL = "http://localhost:8080/api"; // Default to localhost for development
+// const API_BASE_URL = "http://localhost:8080/api"; // Default to localhost for development
+const API_BASE_URL = "https://faulthub-container-app.orangeplant-b94e05f4.southeastasia.azurecontainerapps.io/api"; // Default to localhost for development
 
 // Utility function to get JWT token from localStorage
 export const getAuthToken = () => { // Export getAuthToken

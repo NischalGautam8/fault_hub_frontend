@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 
-const WS_URL = 'http://localhost:9093';
-
+const WS_URL = 'https://faulthub-container-app.orangeplant-b94e05f4.southeastasia.azurecontainerapps.io';
+// const WS_URL = 'http://localhost:9094'; 
 export interface Notification {
   id: number;
   message: string;
