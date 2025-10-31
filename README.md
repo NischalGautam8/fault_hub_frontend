@@ -58,4 +58,9 @@ This project includes Convex configuration under `convex/`. Review `convex/READM
 ## Backend
 
 Backend repository: https://github.com/NischalGautam8/fault_hub_backend
+<img width="1919" height="921" alt="image" src="https://github.com/user-attachments/assets/ffc9169b-667f-44fd-9238-7d144b3daca7" />
+<img width="1903" height="908" alt="image" src="https://github.com/user-attachments/assets/b29a526a-d4d4-4907-9a31-23a4cfe5d80e" />
+<img width="1897" height="900" alt="image" src="https://github.com/user-attachments/assets/a2fccab7-3a27-45fc-bff1-d4b96d54114b" />
+
+
 
